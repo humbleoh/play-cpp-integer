@@ -1,5 +1,7 @@
 #pragma once
 
+#include "details/big_uint.hpp"
+
 #include <algorithm>
 #include <array>
 #include <type_traits>
