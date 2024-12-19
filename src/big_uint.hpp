@@ -4,6 +4,8 @@
 
 #include <algorithm>
 #include <array>
+#include <format>
+#include <string_view>
 #include <type_traits>
 
 namespace big_uint {
@@ -40,6 +42,30 @@ inline constexpr auto big_uint<T, N>::operator-(
 {
   auto w = big_uint<T, (N > Np) ? N : Np>{ 0 };
   detail::big_uint::substract(w, *this, u);
+  return w;
+}
+
+template<std::unsigned_integral T, std::size_t N>
+inline constexpr big_uint<T, N> from_string(std::string_view s)
+{
+  auto v = big_uint<T, N>{ 0 };
+  detail::big_uint::from_string(v, s);
+  return v;
 }
 
 }
+
+template<std::unsigned_integral T, std::size_t N>
+struct std::formatter<big_uint::big_uint<T, N>> {
+  constexpr auto parse(std::format_parse_context& context)
+  {
+    return context.begin();
+  }
+  
+  auto format(const big_uint::big_uint<T, N>& v, std::format_context& context) const
+  {
+    std::string s;
+    detail::big_uint::to_string(s, v);
+    return std::format_to(context.out(), "{}", s);
+  }
+};
