@@ -21,6 +21,11 @@ struct big_uint : detail::big_uint::big_uint<T, N> {
   constexpr auto operator-(
     const big_uint<T, Np>& u) const
     -> big_uint<T, (N > Np) ? N : Np>;
+
+  template<std::size_t Np>
+  constexpr auto operator*(
+    const big_uint<T, Np>& u) const
+    -> big_uint<T, (N > Np) ? N : Np>;
 };
 
 template<std::unsigned_integral T, std::size_t N>
@@ -42,6 +47,17 @@ inline constexpr auto big_uint<T, N>::operator-(
 {
   auto w = big_uint<T, (N > Np) ? N : Np>{ 0 };
   detail::big_uint::substract(w, *this, u);
+  return w;
+}
+
+template<std::unsigned_integral T, std::size_t N>
+template<std::size_t Np>
+inline constexpr auto big_uint<T, N>::operator*(
+  const big_uint<T, Np>& u) const
+  -> big_uint<T, (N > Np) ? N : Np>
+{
+  auto w = big_uint<T, (N > Np) ? N : Np>{ 0 };
+  detail::big_uint::multiply(w, *this, u);
   return w;
 }
 

@@ -99,6 +99,15 @@ inline constexpr bool substract(
   return b;
 }
 
+template<std::unsigned_integral T, std::size_t N1, std::size_t N2>
+inline constexpr bool multiply(
+  big_uint<T, (N1 > N2) ? N1 : N2>& u,
+  const big_uint<T, N1>& v,
+  const big_uint<T, N2>& w) noexcept
+{
+  return false;
+}
+
 template<std::unsigned_integral T, std::size_t N>
 inline constexpr void complement(big_uint<T, N>& u, const big_uint<T, N>& v) noexcept
 {
@@ -128,24 +137,24 @@ inline constexpr bool compile_time_assert(bool pred) noexcept
 template<std::unsigned_integral T, std::size_t N>
 inline constexpr void from_string(big_uint<T, N>& u, std::string_view s) noexcept
 {
-  ASSERT((u.size() * (sizeof(T) << 1u)) > s.length());
-//  std::size_t i = 0;
-//  for (auto rit = std::cbegin(s); rit != std::cend(s); ++rit) {
-//    char c = *rit;
-//    T v;
-//    if (c >= '0' && c <= '9') {
-//      v = c - '0';
-//    } else if (c >= 'a' && c <= 'z') {
-//      v = c - 'a';
-//    } else if (c >= 'A' && c <= 'Z') {
-//      v = c - 'A';
-//    } else {
-//      ASSERT(false);
-//    }
-//    
-//    u[i / u.word_hbytes] |= v << (i % u.word_hbytes * 4u);
-//    i++;
-//  }
+  //ASSERT((u.size() * (sizeof(T) << 1u)) > s.length());
+  std::size_t i = 0;
+  for (auto rit = std::crbegin(s); rit != std::crend(s); ++rit) {
+    char c = *rit;
+    T v;
+    if (c >= '0' && c <= '9') {
+      v = c - '0';
+    } else if (c >= 'a' && c <= 'z') {
+      v = c - 'a' + 10;
+    } else if (c >= 'A' && c <= 'Z') {
+      v = c - 'A' + 10;
+    } else {
+      //ASSERT(false);
+    }
+    
+    u[i / u.word_hbytes] |= v << ((i % u.word_hbytes) * 4u);
+    i++;
+  }
 }
 
 template<std::unsigned_integral T, std::size_t N>
