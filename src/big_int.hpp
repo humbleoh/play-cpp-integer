@@ -9,8 +9,8 @@
 
 namespace big_int {
 
-template<std::unsigned_integral DigitType, std::size_t N>
-struct big_int : big_uint::big_uint<DigitType, N>
+template<std::unsigned_integral T, std::size_t N>
+struct big_int : big_uint::big_uint<T, N>
 {
   constexpr bool sign() const noexcept
   {
@@ -18,13 +18,13 @@ struct big_int : big_uint::big_uint<DigitType, N>
   }
 };
 
-template<std::unsigned_integral DigitType, std::size_t N>
-constexpr big_int<DigitType, N> operator+(
-  const big_int<DigitType, N>& u,
-  const big_int<DigitType, N>& v) noexcept
+template<std::unsigned_integral T, std::size_t N>
+constexpr big_int<T, N> operator+(
+  const big_int<T, N>& u,
+  const big_int<T, N>& v) noexcept
 {
-  using bint = big_int<DigitType, N>;
-  using buint = big_uint::big_uint<DigitType, N>;
+  using bint = big_int<T, N>;
+  using buint = big_uint::big_uint<T, N>;
   auto& up = static_cast<const buint&>(u);
   auto& vp = static_cast<const buint&>(v);
   return static_cast<bint>(up + vp);
@@ -54,10 +54,10 @@ inline constexpr auto big_uint<T, N>::operator*(
 }
 
 */
-template<std::unsigned_integral DigitType, std::size_t N>
-constexpr big_int<DigitType, N> from_string(std::string_view s) noexcept
+template<std::unsigned_integral T, std::size_t N>
+constexpr big_int<T, N> from_string(std::string_view s) noexcept
 {
-  auto v = big_int<DigitType, N>{ 0 };
+  auto v = big_int<T, N>{ 0 };
   bool sign = (s[0] == '-');
   detail::big_uint::from_string(v, sign ? s.substr(1) : s);
   if (sign)
@@ -66,15 +66,15 @@ constexpr big_int<DigitType, N> from_string(std::string_view s) noexcept
 }
 }
 
-template<std::unsigned_integral DigitType, std::size_t N>
-struct std::formatter<big_int::big_int<DigitType, N>>
+template<std::unsigned_integral T, std::size_t N>
+struct std::formatter<big_int::big_int<T, N>>
 {
   constexpr auto parse(std::format_parse_context& context)
   {
     return context.begin();
   }
   
-  auto format(const big_int::big_int<DigitType, N>& v, std::format_context& context) const
+  auto format(const big_int::big_int<T, N>& v, std::format_context& context) const
   {
     std::string s;
     char sign = v.sign() ? '-' : '+';

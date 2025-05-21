@@ -19,27 +19,28 @@ consteval std::size_t ceil(std::size_t value, std::size_t base)
   return (value + base - 1) / base;
 }
 
-template<std::unsigned_integral DigitType, std::size_t N>
-struct big_uint : std::array<DigitType, N / (sizeof(DigitType) * CHAR_BIT)>
+template<std::unsigned_integral T, std::size_t N>
+struct big_uint : std::array<T, N / (sizeof(T) * CHAR_BIT)>
 {
-  static constexpr std::size_t digit_nbits = sizeof(DigitType) * CHAR_BIT;
+  using digit_type = T;
+  static constexpr std::size_t digit_nbits = sizeof(T) * CHAR_BIT;
   static_assert(N % digit_nbits == 0);
-  static constexpr std::size_t digit_nhbytes = (sizeof(DigitType) << 1u);
+  static constexpr std::size_t digit_nhbytes = (sizeof(T) << 1u);
 };
 
-template<std::unsigned_integral DigitType, std::size_t N>
-constexpr bool msb(const big_uint<DigitType, N>& u) noexcept
+template<std::unsigned_integral T, std::size_t N>
+constexpr bool msb(const big_uint<T, N>& u) noexcept
 {
   constexpr unsigned pos_msb = u.digit_nbits - 1;
   return (u.back() >> pos_msb & 0x1u);
 }
 
-template<std::unsigned_integral DigitType, std::size_t N>
-constexpr bool increment(big_uint<DigitType, N>& u) noexcept
+template<std::unsigned_integral T, std::size_t N>
+constexpr bool increment(big_uint<T, N>& u) noexcept
 {
-  DigitType c = 1u;
+  T c = 1u;
   for (unsigned i = 0u; i < u.size(); ++i) {
-    DigitType v = u[i];
+    T v = u[i];
     u[i] = v + c;
     c = u[i] < v;
   }
@@ -47,8 +48,8 @@ constexpr bool increment(big_uint<DigitType, N>& u) noexcept
   return c;
 }
 
-template<std::unsigned_integral DigitType, std::size_t N>
-constexpr void two_complement(big_uint<DigitType, N>& u) noexcept
+template<std::unsigned_integral T, std::size_t N>
+constexpr void two_complement(big_uint<T, N>& u) noexcept
 {
   for (unsigned i = 0u; i < u.size(); ++i) {
     u[i] = ~u[i];
@@ -57,13 +58,13 @@ constexpr void two_complement(big_uint<DigitType, N>& u) noexcept
   increment(u);
 }
 
-template<std::unsigned_integral DigitType, std::size_t N>
+template<std::unsigned_integral T, std::size_t N>
 constexpr bool add(
-  big_uint<DigitType, N>& u,
-  const big_uint<DigitType, N>& v,
-  const big_uint<DigitType, N>& w) noexcept
+  big_uint<T, N>& u,
+  const big_uint<T, N>& v,
+  const big_uint<T, N>& w) noexcept
 {
-  DigitType c = 0u;
+  T c = 0u;
   for (unsigned i = 0u; i < u.size(); ++i) {
     u[i] = v[i] + w[i] + c;
     c = (!c && (u[i] < v[i])) || (c && (u[i] <= v[i]));
@@ -150,13 +151,13 @@ inline constexpr bool compile_time_assert(bool pred) noexcept
     } \
   } while (0)
 
-template<std::unsigned_integral DigitType, std::size_t N>
-constexpr void from_string(big_uint<DigitType, N>& u, std::string_view s) noexcept
+template<std::unsigned_integral T, std::size_t N>
+constexpr void from_string(big_uint<T, N>& u, std::string_view s) noexcept
 {
   unsigned i = 0;
   for (auto rit = std::crbegin(s); rit != std::crend(s); ++rit) {
     char c = *rit;
-    DigitType v;
+    T v;
     if (c >= '0' && c <= '9') {
       v = c - '0';
     } else if (c >= 'a' && c <= 'z') {
@@ -172,11 +173,11 @@ constexpr void from_string(big_uint<DigitType, N>& u, std::string_view s) noexce
   }
 }
 
-template<std::unsigned_integral DigitType, std::size_t N>
-constexpr void to_string(std::string& s, const big_uint<DigitType, N>& u)
+template<std::unsigned_integral T, std::size_t N>
+constexpr void to_string(std::string& s, const big_uint<T, N>& u)
 {
   for (auto rit = std::crbegin(u); rit != std::crend(u); ++rit) {
-    s.append(std::format("{1:0>{0}x}", sizeof(DigitType) << 1u, *rit));
+    s.append(std::format("{1:0>{0}x}", sizeof(T) << 1u, *rit));
   }
 }
 

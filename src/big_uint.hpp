@@ -10,17 +10,17 @@
 
 namespace big_uint {
 
-template<std::unsigned_integral DigitType, std::size_t N>
-struct big_uint : detail::big_uint::big_uint<DigitType, N>
+template<std::unsigned_integral T, std::size_t N>
+struct big_uint : detail::big_uint::big_uint<T, N>
 {
 };
 
-template<std::unsigned_integral DigitType, std::size_t N>
-constexpr big_uint<DigitType, N> operator+(
-  const big_uint<DigitType, N>& u,
-  const big_uint<DigitType, N>& v) noexcept
+template<std::unsigned_integral T, std::size_t N>
+constexpr big_uint<T, N> operator+(
+  const big_uint<T, N>& u,
+  const big_uint<T, N>& v) noexcept
 {
-  big_uint<DigitType, N> w;
+  big_uint<T, N> w;
   detail::big_uint::add(w, u, v);
   return w;
 }
@@ -51,24 +51,24 @@ inline constexpr auto big_uint<T, N>::operator*(
 }
 
 */
-template<std::unsigned_integral DigitType, std::size_t N>
-constexpr big_uint<DigitType, N> from_string(std::string_view s) noexcept
+template<std::unsigned_integral T, std::size_t N>
+constexpr big_uint<T, N> from_string(std::string_view s) noexcept
 {
-  auto v = big_uint<DigitType, N>{ 0 };
+  auto v = big_uint<T, N>{ 0 };
   detail::big_uint::from_string(v, s);
   return v;
 }
 }
 
-template<std::unsigned_integral DigitType, std::size_t N>
-struct std::formatter<big_uint::big_uint<DigitType, N>>
+template<std::unsigned_integral T, std::size_t N>
+struct std::formatter<big_uint::big_uint<T, N>>
 {
   constexpr auto parse(std::format_parse_context& context)
   {
     return context.begin();
   }
   
-  auto format(const big_uint::big_uint<DigitType, N>& v, std::format_context& context) const
+  auto format(const big_uint::big_uint<T, N>& v, std::format_context& context) const
   {
     std::string s;
     detail::big_uint::to_string(s, v);
