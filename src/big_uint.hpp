@@ -10,35 +10,24 @@
 
 namespace big_uint {
 
-template<std::unsigned_integral T, std::size_t N>
-struct big_uint : detail::big_uint::big_uint<T, N> {
-  template<std::size_t Np>
-  constexpr auto operator+(
-    const big_uint<T, Np>& u) const
-    -> big_uint<T, (N > Np) ? N : Np>;
-
-  template<std::size_t Np>
-  constexpr auto operator-(
-    const big_uint<T, Np>& u) const
-    -> big_uint<T, (N > Np) ? N : Np>;
-
-  template<std::size_t Np>
-  constexpr auto operator*(
-    const big_uint<T, Np>& u) const
-    -> big_uint<T, (N > Np) ? N : Np>;
+template<std::unsigned_integral DigitType, std::size_t N>
+struct big_uint : detail::big_uint::big_uint<DigitType, N>
+{
 };
 
-template<std::unsigned_integral T, std::size_t N>
-template<std::size_t Np>
-inline constexpr auto big_uint<T, N>::operator+(
-  const big_uint<T, Np>& u) const
-  -> big_uint<T, (N > Np) ? N : Np>
+template<std::unsigned_integral DigitType, std::size_t N>
+constexpr big_uint<DigitType, N> operator+(
+  const big_uint<DigitType, N>& u,
+  const big_uint<DigitType, N>& v) noexcept
 {
-  auto w = big_uint<T, (N > Np) ? N : Np>{ 0 };
-  detail::big_uint::add(w, *this, u);
+  big_uint<DigitType, N> w;
+  detail::big_uint::add(w, u, v);
   return w;
 }
 
+
+
+/*
 template<std::unsigned_integral T, std::size_t N>
 template<std::size_t Np>
 inline constexpr auto big_uint<T, N>::operator-(
@@ -61,24 +50,25 @@ inline constexpr auto big_uint<T, N>::operator*(
   return w;
 }
 
-template<std::unsigned_integral T, std::size_t N>
-inline constexpr big_uint<T, N> from_string(std::string_view s)
+*/
+template<std::unsigned_integral DigitType, std::size_t N>
+constexpr big_uint<DigitType, N> from_string(std::string_view s) noexcept
 {
-  auto v = big_uint<T, N>{ 0 };
+  auto v = big_uint<DigitType, N>{ 0 };
   detail::big_uint::from_string(v, s);
   return v;
 }
-
 }
 
-template<std::unsigned_integral T, std::size_t N>
-struct std::formatter<big_uint::big_uint<T, N>> {
+template<std::unsigned_integral DigitType, std::size_t N>
+struct std::formatter<big_uint::big_uint<DigitType, N>>
+{
   constexpr auto parse(std::format_parse_context& context)
   {
     return context.begin();
   }
   
-  auto format(const big_uint::big_uint<T, N>& v, std::format_context& context) const
+  auto format(const big_uint::big_uint<DigitType, N>& v, std::format_context& context) const
   {
     std::string s;
     detail::big_uint::to_string(s, v);
