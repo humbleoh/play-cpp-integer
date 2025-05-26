@@ -61,7 +61,7 @@ constexpr big_int<T, N> from_string(std::string_view s) noexcept
   bool sign = (s[0] == '-');
   detail::big_uint::from_string(v, sign ? s.substr(1) : s);
   if (sign)
-    detail::big_uint::two_complement(v);
+    detail::big_uint::two_complement(v, v);
   return v;
 }
 }
@@ -79,8 +79,8 @@ struct std::formatter<big_int::big_int<T, N>>
     std::string s;
     char sign = v.sign() ? '-' : '+';
     if (v.sign()) {
-      auto w = v;
-      detail::big_uint::two_complement(w);
+      big_uint::big_uint<T, N> w;
+      detail::big_uint::two_complement(w, v);
       detail::big_uint::to_string(s, w);
     } else {
       detail::big_uint::to_string(s, v);

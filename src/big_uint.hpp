@@ -25,20 +25,25 @@ constexpr big_uint<T, N> operator+(
   return w;
 }
 
-
-
-/*
 template<std::unsigned_integral T, std::size_t N>
-template<std::size_t Np>
-inline constexpr auto big_uint<T, N>::operator-(
-  const big_uint<T, Np>& u) const
-  -> big_uint<T, (N > Np) ? N : Np>
+constexpr big_uint<T, N> operator-(
+  const big_uint<T, N>& u,
+  const big_uint<T, N>& v) noexcept
 {
-  auto w = big_uint<T, (N > Np) ? N : Np>{ 0 };
-  detail::big_uint::substract(w, *this, u);
+  big_uint<T, N> w;
+  detail::big_uint::substract(w, u, v);
   return w;
 }
 
+template<std::unsigned_integral T, std::size_t N>
+constexpr big_uint<T, N> two_complement(const big_uint<T, N>& u) noexcept
+{
+  big_uint<T, N> v;
+  detail::big_uint::two_complement(v, u);
+  return v;
+}
+
+/*
 template<std::unsigned_integral T, std::size_t N>
 template<std::size_t Np>
 inline constexpr auto big_uint<T, N>::operator*(

@@ -36,6 +36,18 @@ int main(int argc, char *arg[])
   constexpr auto uzz = big_uint::from_string<uint32_t, 128>("ffffffffffffffffffffffffffffff"sv);
   constexpr auto uxx = uyy + uzz;
   std::cout << std::format(" {}", uxx) << std::endl;
+
+  std::cout << "==" << std::endl;
+  constexpr auto a = big_uint::from_string<uint32_t, 128>("86f6050d979544fe39e7142446a40b3"sv);
+  constexpr auto b = big_uint::from_string<uint32_t, 128>("ab5a0c4d00312f392c0edc2878d6d8a"sv);
+  constexpr auto c = b - a;
+  constexpr auto d = a - b;
+  constexpr auto e = big_uint::two_complement(d);
+  std::cout << std::format(" {}", a) << std::endl;
+  std::cout << std::format(" {}", b) << std::endl;
+  std::cout << std::format(" {}", c) << std::endl;
+  std::cout << std::format(" {}", d) << std::endl;
+  std::cout << std::format(" {}", e) << std::endl;
   /*
   std::cout << std::format("{} {} {} {} {:b}", u[0], u.size(), u.word_nbits,
     u.word_hbytes, w.bitmask_msb) << std::endl;

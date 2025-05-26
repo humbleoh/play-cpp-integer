@@ -36,26 +36,31 @@ constexpr bool msb(const big_uint<T, N>& u) noexcept
 }
 
 template<std::unsigned_integral T, std::size_t N>
-constexpr bool increment(big_uint<T, N>& u) noexcept
+constexpr bool add_digit(
+  big_uint<T, N>& u,
+  const big_uint<T, N>& v,
+  T w) noexcept
 {
-  T c = 1u;
-  for (unsigned i = 0u; i < u.size(); ++i) {
-    T v = u[i];
-    u[i] = v + c;
-    c = u[i] < v;
+  T c = w;
+  for (unsigned i = 0u; i < v.size() && c > 0; ++i) {
+    T temp = v[i];
+    u[i] = temp + c;
+    c = u[i] < temp;
   }
 
   return c;
 }
 
 template<std::unsigned_integral T, std::size_t N>
-constexpr void two_complement(big_uint<T, N>& u) noexcept
+constexpr void two_complement(
+  big_uint<T, N>& u,
+  const big_uint<T, N>& v) noexcept
 {
-  for (unsigned i = 0u; i < u.size(); ++i) {
-    u[i] = ~u[i];
+  for (unsigned i = 0u; i < v.size(); ++i) {
+    u[i] = ~v[i];
   }
 
-  increment(u);
+  add_digit(u, u, 1u);
 }
 
 template<std::unsigned_integral T, std::size_t N>
@@ -73,48 +78,22 @@ constexpr bool add(
   return c;
 }
 
-/*
-template<std::unsigned_integral T, std::size_t N1, std::size_t N2>
-inline constexpr bool substract(
-  big_uint<T, (N1 > N2) ? N1 : N2>& u,
-  const big_uint<T, N1>& v,
-  const big_uint<T, N2>& w) noexcept
+template<std::unsigned_integral T, std::size_t N>
+constexpr bool substract(
+  big_uint<T, N>& u,
+  const big_uint<T, N>& v,
+  const big_uint<T, N>& w) noexcept
 {
   T b = 0u;
-  std::size_t i = 0u;
-  std::size_t s = v.size() < w.size() ? v.size() : w.size();
-  for ( ; i < s; ++i) {
-    u[i] = v[i] - b;
-    b = (u[i] > std::numeric_limits<T>::max() - b) ? 1u : 0u;
-    u[i] -= w[i];
-    if (u[i] > std::numeric_limits<T>::max() - w[i]) {
-      b++;
-    }
-  }
-
-  if constexpr (v.size() > w.size()) {
-    for ( ; i < v.size(); ++i) {
-      u[i] = v[i] - b;
-      b = (u[i] > std::numeric_limits<T>::max() - b) ? 1u : 0u;
-    }
-  } else {
-    for ( ; i < w.size(); ++i) {
-      u[i] = - b;
-      b = (u[i] > std::numeric_limits<T>::max() - b) ? 1u : 0u;
-      u[i] -= w[i];
-      if (u[i] > std::numeric_limits<T>::max() - w[i]) {
-        b++;
-      }
-    }
-  }
-
-  if constexpr (u.bitmask_msb > 0) {
-    u.back() &= u.bitmask_msb;
+  for (unsigned i = 0u ; i < v.size(); ++i) {
+    u[i] = v[i] - w[i] - b;
+    b = (!b && u[i] > v[i]) || (b && u[i] >= v[i]);
   }
 
   return b;
 }
 
+/*
 template<std::unsigned_integral T, std::size_t N1, std::size_t N2>
 inline constexpr bool multiply(
   big_uint<T, (N1 > N2) ? N1 : N2>& u,
