@@ -48,6 +48,54 @@ int main(int argc, char *arg[])
   std::cout << std::format(" {}", c) << std::endl;
   std::cout << std::format(" {}", d) << std::endl;
   std::cout << std::format(" {}", e) << std::endl;
+
+  std::cout << "==" << std::endl;
+  constexpr auto ap = big_uint::from_string<uint32_t, 128>("0"sv);
+  constexpr auto bp = big_uint::from_string<uint32_t, 128>("0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f"sv);
+  constexpr auto cp = bp - ap;
+  constexpr auto dp = ap - bp;
+  constexpr auto ep = big_uint::two_complement(dp);
+  std::cout << std::format(" {}", ap) << std::endl;
+  std::cout << std::format(" {}", bp) << std::endl;
+  std::cout << std::format(" {}", cp) << std::endl;
+  std::cout << std::format(" {}", dp) << std::endl;
+  std::cout << std::format(" {}", ep) << std::endl;
+
+  std::cout << "==" << std::endl;
+  constexpr auto k = big_uint::from_string<uint32_t, 128>("0645d91e97ca853ad4fa29c"sv);
+  constexpr auto l = big_uint::from_string<uint32_t, 128>("33b2e3c9fd0803ce7ffffff"sv);
+  constexpr auto ik = big_int::from_string<uint32_t, 128>("0645d91e97ca853ad4fa29c"sv);
+  constexpr auto il = big_int::from_string<uint32_t, 128>("33b2e3c9fd0803ce7ffffff"sv);
+  constexpr auto kl = k - l;
+  constexpr auto lk = l - k;
+  constexpr auto klp = big_uint::two_complement(kl);
+  constexpr auto ikl = ik - il;
+  constexpr auto ilk = il - ik;
+  constexpr auto iklp = big_uint::two_complement(ikl);
+  std::cout << std::format(" {}", k) << std::endl;
+  std::cout << std::format(" {}", l) << std::endl;
+  std::cout << std::format(" {}", kl) << std::endl;
+  std::cout << std::format(" {}", lk) << std::endl;
+  std::cout << std::format(" {}", klp) << std::endl;
+  std::cout << "----" << std::endl;
+  std::cout << std::format(" {}", ik) << std::endl;
+  std::cout << std::format(" {}", il) << std::endl;
+  std::cout << std::format(" {}", ikl) << std::endl;
+  std::cout << std::format(" {}", ilk) << std::endl;
+  std::cout << std::format(" {}", iklp) << std::endl;
+
+  std::cout << "==" << std::endl;
+  constexpr auto s = big_uint::from_string<uint32_t, 64>("5e4b9f99b2b05d64"sv);
+  constexpr auto t = big_uint::from_string<uint32_t, 64>("33b2e3c9fd0803ce"sv);
+  constexpr auto sp = big_uint::from_string<uint64_t, 128>("0645d91e97ca853ad4fa29c"sv);
+  constexpr auto tp = big_uint::from_string<uint64_t, 128>("33b2e3c9fd0803ce7ffffff"sv);
+  constexpr auto sxt = s * t;
+  constexpr auto kxl = k * l;
+  constexpr auto spxtp = sp * tp;
+  std::cout << std::format(" {}", sxt) << std::endl;
+  std::cout << std::format(" {}", kxl) << std::endl;
+  std::cout << std::format(" {}", spxtp) << std::endl;
+
   /*
   std::cout << std::format("{} {} {} {} {:b}", u[0], u.size(), u.word_nbits,
     u.word_hbytes, w.bitmask_msb) << std::endl;

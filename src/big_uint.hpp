@@ -43,18 +43,17 @@ constexpr big_uint<T, N> two_complement(const big_uint<T, N>& u) noexcept
   return v;
 }
 
-/*
 template<std::unsigned_integral T, std::size_t N>
-template<std::size_t Np>
-inline constexpr auto big_uint<T, N>::operator*(
-  const big_uint<T, Np>& u) const
-  -> big_uint<T, (N > Np) ? N : Np>
+constexpr big_uint<T, N> operator*(
+  const big_uint<T, N>& u,
+  const big_uint<T, N>& v) noexcept
 {
-  auto w = big_uint<T, (N > Np) ? N : Np>{ 0 };
-  detail::big_uint::multiply(w, *this, u);
+  auto w = big_uint<T, N>{ 0 };
+  detail::big_uint::multiply(w, u, v);
   return w;
 }
 
+/*
 */
 template<std::unsigned_integral T, std::size_t N>
 constexpr big_uint<T, N> from_string(std::string_view s) noexcept

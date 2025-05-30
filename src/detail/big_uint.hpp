@@ -7,6 +7,7 @@
 #include <concepts>
 #include <climits>
 #include <cstddef>
+#include <cstdint>
 #include <format>
 #include <numeric>
 #include <string_view>
@@ -93,16 +94,51 @@ constexpr bool substract(
   return b;
 }
 
-/*
-template<std::unsigned_integral T, std::size_t N1, std::size_t N2>
-inline constexpr bool multiply(
-  big_uint<T, (N1 > N2) ? N1 : N2>& u,
-  const big_uint<T, N1>& v,
-  const big_uint<T, N2>& w) noexcept
+template<typename T>
+concept digit_promotable = std::unsigned_integral<T>
+  && (std::same_as<T, std::uint8_t> || std::same_as<T, std::uint16_t>
+    || std::same_as<T, std::uint32_t> || std::same_as<T, std::uint64_t>);
+
+template<std::unsigned_integral T>
+struct large_digit_from_digit;
+
+#define DEFINE_LARGE_DIGIT_FROM_DIGIT(digit, large_digit) \
+  template<> \
+  struct large_digit_from_digit<digit> \
+  { \
+    using type = large_digit; \
+  }
+
+DEFINE_LARGE_DIGIT_FROM_DIGIT(std::uint8_t,  std::uint16_t);
+DEFINE_LARGE_DIGIT_FROM_DIGIT(std::uint16_t, std::uint32_t);
+DEFINE_LARGE_DIGIT_FROM_DIGIT(std::uint32_t, std::uint64_t);
+DEFINE_LARGE_DIGIT_FROM_DIGIT(std::uint64_t, unsigned __int128);
+
+template<digit_promotable Digit,
+  typename LargeDigit = typename large_digit_from_digit<Digit>::type>
+constexpr LargeDigit digit_multiply(Digit a, Digit b) noexcept
 {
-  return false;
+  return static_cast<LargeDigit>(a) * b;
 }
 
+template<std::unsigned_integral T, std::size_t N>
+constexpr void multiply(
+  big_uint<T, N>& u,
+  const big_uint<T, N>& v,
+  const big_uint<T, N>& w) noexcept
+{
+  for (unsigned i = 0; i < std::size(v); ++i) {
+    T c = 0u;
+    for (unsigned j = 0, k = i; j < std::size(w) && k < std::size(u); ++j, ++k) {
+      auto r = digit_multiply(v[i], w[j]);
+      r = r + u[k] + c;
+      u[k] = std::numeric_limits<T>::max() & r;
+      c = std::numeric_limits<T>::max() & (r >> (sizeof(T) << 3));
+    }
+  }
+}
+
+/*
 template<std::unsigned_integral T, std::size_t N>
 inline constexpr void complement(big_uint<T, N>& u, const big_uint<T, N>& v) noexcept
 {

@@ -30,6 +30,18 @@ constexpr big_int<T, N> operator+(
   return static_cast<bint>(up + vp);
 }
 
+template<std::unsigned_integral T, std::size_t N>
+constexpr big_int<T, N> operator-(
+  const big_int<T, N>& u,
+  const big_int<T, N>& v) noexcept
+{
+  using bint = big_int<T, N>;
+  using buint = big_uint::big_uint<T, N>;
+  auto& up = static_cast<const buint&>(u);
+  auto& vp = static_cast<const buint&>(v);
+  return static_cast<bint>(up - vp);
+}
+
 /*
 template<std::unsigned_integral T, std::size_t N>
 template<std::size_t Np>
