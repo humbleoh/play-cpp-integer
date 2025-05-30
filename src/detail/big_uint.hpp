@@ -27,6 +27,7 @@ struct big_uint : std::array<T, N / (sizeof(T) * CHAR_BIT)>
   static constexpr std::size_t digit_nbits = sizeof(T) * CHAR_BIT;
   static_assert(N % digit_nbits == 0);
   static constexpr std::size_t digit_nhbytes = (sizeof(T) << 1u);
+  static constexpr T digit_mask = static_cast<T>(-1);
 };
 
 template<std::unsigned_integral T, std::size_t N>
@@ -129,13 +130,14 @@ constexpr void multiply(
   const big_uint<T, N>& v,
   const big_uint<T, N>& w) noexcept
 {
-  for (unsigned i = 0; i < std::size(v); ++i) {
+  std::size_t size = u.size();
+  for (unsigned i = 0; i < size; ++i) {
     T c = 0u;
-    for (unsigned j = 0, k = i; j < std::size(w) && k < std::size(u); ++j, ++k) {
+    for (unsigned j = 0, k = i; j < size && k < size; ++j, ++k) {
       large_digit<T> r = digit_multiply(v[i], w[j]);
       r = r + u[k] + c;
-      u[k] = std::numeric_limits<T>::max() & r;
-      c = std::numeric_limits<T>::max() & (r >> (sizeof(T) << 3));
+      u[k] = u.digit_mask & r;
+      c = u.digit_mask & (r >> u.digit_nbits);
     }
   }
 }
